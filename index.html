@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio — My Work</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --leather-dark: #5c3210;
+      --leather-mid:  #7a4a1e;
+      --leather-light:#8a5420;
+      --gold:         #c8a040;
+      --gold-light:   #f5d87a;
+      --bg:           #0f0c06;
+      --paper:        #f5edd8;
+      --ink:          #1e1408;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      font-family: 'Georgia', serif;
+      color: var(--paper);
+    }
+
+    /* ── canvas ── */
+    #canvas-wrapper {
+      position: fixed;
+      inset: 0;
+    }
+    canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* ── custom cursor ── */
+    #cursor {
+      position: fixed;
+      width: 14px; height: 14px;
+      border: 2px solid var(--gold-light);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s, border-color 0.2s;
+      z-index: 100;
+      mix-blend-mode: difference;
+    }
+    #cursor.hovering {
+      transform: translate(-50%, -50%) scale(1.8);
+      border-color: #fff;
+    }
+
+    /* ── header ── */
+    #header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 28px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #header h1 {
+      font-size: 15px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      opacity: 0.85;
+      font-weight: normal;
+    }
+    #header p {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      opacity: 0.55;
+      margin-top: 4px;
+    }
+    #hint {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      opacity: 0.4;
+      text-align: right;
+      line-height: 1.7;
+    }
+
+    /* ── project panel ── */
+    #panel {
+      position: fixed;
+      top: 50%;
+      right: 40px;
+      transform: translateY(-50%) translateX(20px);
+      width: 220px;
+      background: rgba(18, 11, 4, 0.96);
+      border: 1px solid rgba(200, 160, 64, 0.4);
+      border-radius: 10px;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 50;
+      backdrop-filter: blur(6px);
+    }
+    #panel.visible {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(-50%) translateX(0);
+    }
+    #panel-emoji {
+      font-size: 30px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    #panel-title {
+      font-size: 16px;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+    }
+    #panel-tag {
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: rgba(200,160,64,0.15);
+      color: var(--gold);
+      border: 1px solid rgba(200,160,64,0.3);
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-bottom: 10px;
+    }
+    #panel-desc {
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(245, 237, 216, 0.65);
+    }
+    #panel-link {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(245,216,122,0.3);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+    #panel-link:hover { border-color: var(--gold-light); }
+    #panel-close {
+      position: absolute;
+      top: 12px; right: 14px;
+      background: none;
+      border: none;
+      color: rgba(200,160,64,0.5);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    #panel-close:hover { color: var(--gold-light); }
+
+    /* ── loading screen ── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      transition: opacity 0.6s;
+    }
+    #loader.fade { opacity: 0; pointer-events: none; }
+    #loader-stamp {
+      width: 80px; height: 80px;
+      border: 3px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 20px;
+      animation: stamp-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes stamp-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50%       { transform: scale(1.1); opacity: 1; }
+    }
+    #loader p {
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.5;
+    }
+
+    /* ── footer hint ── */
+    #footer {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loader">
+  <div id="loader-stamp">🧳</div>
+  <p>Unpacking...</p>
+</div>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+
+<!-- Header -->
+<div id="header">
+  <div>
+    <h1>Your Name</h1>
+    <p>Designer &amp; Developer</p>
+  </div>
+  <div id="hint">
+    Move to tilt<br>
+    Click a sticker to explore
+  </div>
+</div>
+
+<!-- 3D canvas -->
+<div id="canvas-wrapper">
+  <canvas id="c"></canvas>
+</div>
+
+<!-- Project panel -->
+<div id="panel">
+  <button id="panel-close" aria-label="Close">&times;</button>
+  <span id="panel-emoji"></span>
+  <div id="panel-title"></div>
+  <div id="panel-tag"></div>
+  <div id="panel-desc"></div>
+  <a id="panel-link" href="#" target="_blank" rel="noopener">View project →</a>
+</div>
+
+<!-- Footer -->
+<div id="footer">Hover &amp; click the stickers</div>
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ─────────────────────────────────────────────
+   STICKER DATA — edit this to customise!
+───────────────────────────────────────────── */
+const STICKERS = [
+  {
+    label:   "Web App",
+    tag:     "Full-stack",
+    desc:    "A full-stack web application with real-time collaboration features and a modern component-driven UI.",
+    emoji:   "🌐",
+    color:   0xe8453c,
+    url:     "https://github.com/",
+    // position on suitcase [x, y, z], rotation [rx, ry, rz], size [w, h]
+    pos:     [0.5,  0.35, 0.62],
+    rot:     [0, 0,  0.15],
+    size:    [0.52, 0.38],
+  },
+  {
+    label:   "Mobile App",
+    tag:     "React Native",
+    desc:    "Cross-platform mobile app for iOS and Android with offline-first sync and smooth animations.",
+    emoji:   "📱",
+    color:   0x2196F3,
+    url:     "https://github.com/",
+    pos:     [-0.55, 0.3, 0.62],
+    rot:     [0, 0, -0.1],
+    size:    [0.46, 0.38],
+  },
+  {
+    label:   "Data Viz",
+    tag:     "D3 / Observable",
+    desc:    "Interactive data visualisation dashboard surfacing insights from 10M+ rows of event data.",
+    emoji:   "📊",
+    color:   0xf5c518,
+    url:     "https://github.com/",
+    pos:     [0.6, -0.25, 0.62],
+    rot:     [0, 0,  0.08],
+    size:    [0.48, 0.36],
+  },
+  {
+    label:   "AI Tool",
+    tag:     "Machine Learning",
+    desc:    "NLP pipeline for document classification and entity extraction, deployed as a serverless API.",
+    emoji:   "🤖",
+    color:   0x4caf50,
+    url:     "https://github.com/",
+    pos:     [-0.5, -0.28, 0.62],
+    rot:     [0, 0, -0.12],
+    size:    [0.46, 0.36],
+  },
+  {
+    label:   "OSS Lib",
+    tag:     "Open Source",
+    desc:    "A zero-dependency utility library with 2k+ GitHub stars, used in production by dozens of teams.",
+    emoji:   "⭐",
+    color:   0xff7043,
+    url:     "https://github.com/",
+    pos:     [0.05, 0.06, 0.62],
+    rot:     [0, 0,  0.05],
+    size:    [0.42, 0.34],
+  },
+  // Side sticker
+  {
+    label:   "Hackathon",
+    tag:     "1st Place",
+    desc:    "Built a crisis coordination tool in 48 hours — won first place at a national hackathon.",
+    emoji:   "🏆",
+    color:   0x9c27b0,
+    url:     "https://github.com/",
+    pos:     [1.42,  0.1,  0.1],
+    rot:     [0, Math.PI / 2, -0.1],
+    size:    [0.46, 0.36],
+  },
+  // Top sticker
+  {
+    label:   "Blog",
+    tag:     "Writing",
+    desc:    "Technical articles on design systems, frontend architecture, and engineering leadership.",
+    emoji:   "✍️",
+    color:   0x00bcd4,
+    url:     "https://github.com/",
+    pos:     [0.28, 0.97, 0.22],
+    rot:     [-Math.PI / 2, 0, 0.1],
+    size:    [0.46, 0.34],
+  },
+];
+
+/* ─────────────────────────────────────────────
+   SCENE SETUP
+───────────────────────────────────────────── */
+const wrapper  = document.getElementById('canvas-wrapper');
+const canvas   = document.getElementById('c');
+const cursorEl = document.getElementById('cursor');
+const panel    = document.getElementById('panel');
+const loader   = document.getElementById('loader');
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color(0x0f0c06);
+scene.fog = new THREE.FogExp2(0x0f0c06, 0.08);
+
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+camera.position.set(0, 0.2, 5.2);
+
+function onResize() {
+  const w = wrapper.clientWidth, h = wrapper.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+onResize();
+window.addEventListener('resize', onResize);
+
+/* ── Lighting ── */
+scene.add(new THREE.AmbientLight(0xffe8b0, 0.35));
+
+const keyLight = new THREE.DirectionalLight(0xfff4dd, 1.3);
+keyLight.position.set(3, 5, 4);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(1024, 1024);
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0xb08040, 0.25);
+fillLight.position.set(-3, 2, 2);
+scene.add(fillLight);
+
+const rimLight = new THREE.DirectionalLight(0xffe090, 0.45);
+rimLight.position.set(0, -3, -4);
+scene.add(rimLight);
+
+/* ground for shadow */
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(12, 12),
+  new THREE.ShadowMaterial({ opacity: 0.25 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -1.35;
+ground.receiveShadow = true;
+scene.add(ground);
+
+/* ─────────────────────────────────────────────
+   SUITCASE
+───────────────────────────────────────────── */
+const suitcaseGroup = new THREE.Group();
+scene.add(suitcaseGroup);
+
+function mat(color, rough = 0.85, metal = 0.05) {
+  return new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+}
+function box(w, h, d, color, rough, metal) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color, rough, metal));
+  m.castShadow = true;
+  return m;
+}
+
+/* body */
+const body = box(2.8, 1.9, 1.2, 0x7a4a1e);
+suitcaseGroup.add(body);
+
+/* lid panel (slightly lighter) */
+const lid = box(2.8, 0.86, 1.22, 0x8a5420);
+lid.position.y = 0.02;
+suitcaseGroup.add(lid);
+
+/* frame / trim */
+function trim(w, h, d, x, y, z) {
+  const m = box(w, h, d, 0xc8a040, 0.35, 0.75);
+  m.position.set(x, y, z);
+  suitcaseGroup.add(m);
+}
+trim(2.88, 0.055, 1.3,   0,    0.02, 0);      // centre seam
+trim(0.055, 1.96, 1.3,   1.42, 0,    0);      // left edge
+trim(0.055, 1.96, 1.3,  -1.42, 0,    0);      // right edge
+trim(2.88,  0.055, 0.055, 0,   0,    0.625);  // front lip
+trim(2.88,  0.055, 0.055, 0,   0,   -0.625);  // back lip
+
+/* corner studs */
+[-1.35, 1.35].forEach(x => [-0.88, 0.88].forEach(y => {
+  const stud = new THREE.Mesh(
+    new THREE.SphereGeometry(0.055, 8, 8),
+    mat(0xd4b040, 0.25, 0.85)
+  );
+  stud.position.set(x, y, 0.625);
+  stud.castShadow = true;
+  suitcaseGroup.add(stud);
+}));
+
+/* handle */
+const hMat = mat(0xc8a040, 0.28, 0.85);
+[-0.3, 0.3].forEach(x => {
+  const base = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.2, 0.1), hMat);
+  base.position.set(x, 0.99, 0);
+  suitcaseGroup.add(base);
+});
+const arc = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.042, 10, 24, Math.PI), hMat);
+arc.position.set(0, 1.21, 0);
+arc.rotation.z = Math.PI;
+suitcaseGroup.add(arc);
+
+/* latches */
+[-0.5, 0.5].forEach(x => {
+  const latch = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.13, 0.06), mat(0xd4aa30, 0.18, 0.92));
+  latch.position.set(x, 0.02, 0.635);
+  suitcaseGroup.add(latch);
+});
+
+/* label holder (front) */
+const labelHolder = new THREE.Mesh(
+  new THREE.BoxGeometry(0.6, 0.38, 0.025),
+  mat(0xc8a040, 0.4, 0.7)
+);
+labelHolder.position.set(-1.0, -0.5, 0.628);
+suitcaseGroup.add(labelHolder);
+
+/* ─────────────────────────────────────────────
+   STICKERS
+───────────────────────────────────────────── */
+function buildStickerTexture(s) {
+  const cv = document.createElement('canvas');
+  cv.width = 256; cv.height = 200;
+  const ctx = cv.getContext('2d');
+
+  const r = (s.color >> 16) & 255;
+  const g = (s.color >> 8)  & 255;
+  const b =  s.color        & 255;
+
+  /* aged paper base */
+  ctx.fillStyle = `rgb(${Math.min(r+30,255)},${Math.min(g+20,255)},${Math.min(b+20,255)})`;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(5, 5, 246, 190, 14);
+  else ctx.rect(5, 5, 246, 190);
+  ctx.fill();
+
+  /* subtle inner light */
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(5, 5, 246, 190, 14);
+  else ctx.rect(5, 5, 246, 190);
+  ctx.fill();
+
+  /* scalloped border */
+  ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+  ctx.lineWidth = 5;
+  ctx.setLineDash([8, 5]);
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(14, 14, 228, 172, 8);
+  else ctx.rect(14, 14, 228, 172);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  /* emoji */
+  ctx.font = '70px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(s.emoji, 128, 92);
+
+  /* label */
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = 'bold 24px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(s.label, 128, 160);
+
+  return new THREE.CanvasTexture(cv);
+}
+
+const stickerMeshes = STICKERS.map(s => {
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(s.size[0], s.size[1]),
+    new THREE.MeshStandardMaterial({ map: buildStickerTexture(s), roughness: 0.65, metalness: 0 })
+  );
+  mesh.position.set(...s.pos);
+  mesh.rotation.set(...s.rot);
+  mesh.userData.sticker = s;
+  suitcaseGroup.add(mesh);
+  return mesh;
+});
+
+/* ─────────────────────────────────────────────
+   INTERACTION
+───────────────────────────────────────────── */
+const raycaster = new THREE.Raycaster();
+const mouseNDC  = new THREE.Vector2();
+const mouse     = { x: 0, y: 0, tx: 0, ty: 0 };
+let   hovered   = null;
+
+document.addEventListener('mousemove', e => {
+  const rect = wrapper.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+  mouse.tx = (cx / rect.width  - 0.5) * 2;
+  mouse.ty = (cy / rect.height - 0.5) * 2;
+  mouseNDC.set(mouse.tx, -mouse.ty);
+
+  cursorEl.style.left = e.clientX + 'px';
+  cursorEl.style.top  = e.clientY + 'px';
+
+  raycaster.setFromCamera(mouseNDC, camera);
+  const hits = raycaster.intersectObjects(stickerMeshes);
+  if (hits.length) {
+    hovered = hits[0].object;
+    cursorEl.classList.add('hovering');
+    document.body.style.cursor = 'none';
+  } else {
+    hovered = null;
+    cursorEl.classList.remove('hovering');
+  }
+});
+
+document.addEventListener('click', () => {
+  if (!hovered) return;
+  const s = hovered.userData.sticker;
+  document.getElementById('panel-emoji').textContent = s.emoji;
+  document.getElementById('panel-title').textContent = s.label;
+  document.getElementById('panel-tag').textContent   = s.tag;
+  document.getElementById('panel-desc').textContent  = s.desc;
+  const link = document.getElementById('panel-link');
+  link.href = s.url;
+  link.style.display = s.url ? 'inline-block' : 'none';
+  panel.classList.add('visible');
+});
+
+document.getElementById('panel-close').addEventListener('click', () => {
+  panel.classList.remove('visible');
+});
+
+/* ─────────────────────────────────────────────
+   RENDER LOOP
+───────────────────────────────────────────── */
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+let clock = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  clock += 0.013;
+
+  mouse.x = lerp(mouse.x, mouse.tx, 0.055);
+  mouse.y = lerp(mouse.y, mouse.ty, 0.055);
+
+  suitcaseGroup.rotation.y = mouse.x * 0.38;
+  suitcaseGroup.rotation.x = -mouse.y * 0.22;
+  suitcaseGroup.rotation.z = Math.sin(clock * 0.4) * 0.014;
+  suitcaseGroup.position.y = Math.sin(clock * 0.7) * 0.045;
+
+  stickerMeshes.forEach(m => {
+    const target = m === hovered ? 1.07 : 1.0;
+    m.scale.setScalar(lerp(m.scale.x, target, 0.1));
+  });
+
+  renderer.render(scene, camera);
+}
+
+/* ─────────────────────────────────────────────
+   BOOT
+───────────────────────────────────────────── */
+animate();
+setTimeout(() => {
+  loader.classList.add('fade');
+  setTimeout(() => loader.remove(), 700);
+}, 900);
+</script>
+</body>
+</html>
