@@ -212,6 +212,17 @@ h1 {
   padding-top: 28px;
 }
 
+.intro-title {
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
+  max-width: 22ch;
+}
+
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -247,17 +258,37 @@ h1 {
   position: relative;
 }
 
-.section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), rgba(255, 255, 255, 0));
-  pointer-events: none;
+.content-card {
+  margin-top: 18px;
+  padding: clamp(20px, 3vw, 34px);
+  border-radius: 22px;
+  border: 1px solid rgba(245, 216, 122, 0.14);
+  background:
+    linear-gradient(180deg, rgba(30, 20, 12, 0.32), rgba(18, 27, 21, 0.7)),
+    radial-gradient(circle at 100% 0%, rgba(134, 184, 149, 0.14) 0%, rgba(134, 184, 149, 0) 34%);
+  box-shadow:
+    0 24px 50px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 h2 {
   margin: 0 0 18px;
   font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+  letter-spacing: 0.01em;
+}
+
+.section-kicker {
+  margin: 0 0 8px;
+  color: var(--accent-gold-light);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.section-lead {
+  margin: -6px 0 20px;
+  max-width: 72ch;
+  color: var(--text-muted);
 }
 
 .projects-grid {
@@ -312,9 +343,13 @@ h2 {
 }
 
 .about-copy ul {
-  margin: 0;
-  padding-left: 20px;
+  margin: 6px 0 0;
+  padding-left: 18px;
   color: var(--text-muted);
+}
+
+.about-copy li {
+  margin-bottom: 6px;
 }
 
 .connect-copy {
