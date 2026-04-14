@@ -1,6 +1,6 @@
 # Portfolio
 
-Personal portfolio website for Wu Jia Tan.
+Personal portfolio website.
 
 ## Changelog
 
@@ -12,3 +12,9 @@ Personal portfolio website for Wu Jia Tan.
 - Ported Framer content structure into coded sections for intro, work, about, and contact.
 - Applied a hybrid visual system that blends warm brown hero tones with green brand accents.
 - Removed the floating hero intro overlay to keep the suitcase unobstructed.
+- Added a dedicated RBG case study page at `rgb-usability-study.html` with reusable styles in `case-study.css`.
+- Mapped the RBG project card link to the new case study page from `scripts/data.js`.
+- Matched the case study content structure to the Framer version and kept each major section as a standalone card.
+- Added metric chips and clearly labeled image placeholders for easy asset replacement.
+- Shifted the portfolio and case-study theme to an off-white/beige base while preserving brown/green accents.
+- Improved text contrast and border visibility for readability across the light theme.

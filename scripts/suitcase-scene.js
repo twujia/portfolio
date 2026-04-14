@@ -83,7 +83,7 @@ export function initSuitcaseScene(projects) {
   renderer.shadowMap.type = window.THREE.PCFSoftShadowMap;
 
   const scene = new window.THREE.Scene();
-  scene.fog = new window.THREE.FogExp2(0x0f0c06, 0.08);
+  scene.fog = new window.THREE.FogExp2(0xe4d6bf, 0.05);
 
   const camera = new window.THREE.PerspectiveCamera(42, 1, 0.1, 100);
   camera.position.set(0, 0.18, 5.15);

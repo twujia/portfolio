@@ -39,7 +39,7 @@ export const PROJECTS = [
     tag: "Usability Testing",
     emoji: "🌿",
     color: 0x6b9a64,
-    href: "#",
+    href: "./rgb-usability-study.html",
     cta: "Learn more",
   },
 ];
