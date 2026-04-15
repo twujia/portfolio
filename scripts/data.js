@@ -1,8 +1,8 @@
 export const SITE_DATA = {
   name: "Wu Jia Tan",
   role: "UX Designer and Researcher",
-  email: "hello@example.com",
-  linkedInUrl: "https://www.linkedin.com/",
+  email: "tanwujia@gmail.com",
+  linkedInUrl: "https://www.linkedin.com/wujiatan/",
 };
 
 export const PROJECTS = [
@@ -39,7 +39,7 @@ export const PROJECTS = [
     tag: "Usability Testing",
     emoji: "🌿",
     color: 0x6b9a64,
-    href: "./rgb-usability-study.html",
+    href: "./rbg-usability-study.html",
     cta: "Learn more",
   },
 ];
