@@ -12,7 +12,7 @@ export const PROJECTS = [
     tag: "AI + UX Research",
     emoji: "🧠",
     color: 0xa77f39,
-    href: "report2barry.html",
+    href: "./report2barry.html",
     cta: "Learn more",
   },
   {
@@ -21,7 +21,7 @@ export const PROJECTS = [
     tag: "Product Design",
     emoji: "🐻",
     color: 0x5f976f,
-    href: "#",
+    href: "./focus-bear.html",
     cta: "Learn more",
   },
   {
@@ -30,7 +30,7 @@ export const PROJECTS = [
     tag: "Mobile UX",
     emoji: "🏀",
     color: 0x4e87c5,
-    href: "#",
+    href: "./watchmates.html",
     cta: "Learn more",
   },
   {
