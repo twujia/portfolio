@@ -12,7 +12,7 @@ export const PROJECTS = [
     tag: "AI + UX Research",
     emoji: "🧠",
     color: 0xa77f39,
-    href: "#",
+    href: "report2barry.html",
     cta: "Learn more",
   },
   {
