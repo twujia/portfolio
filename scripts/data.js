@@ -2,7 +2,7 @@ export const SITE_DATA = {
   name: "Wu Jia Tan",
   role: "UX Designer and Researcher",
   email: "tanwujia@gmail.com",
-  linkedInUrl: "https://www.linkedin.com/wujiatan/",
+  linkedInUrl: "https://www.linkedin.com/in/wujiatan/",
 };
 
 export const PROJECTS = [
